@@ -16,13 +16,13 @@ for i in list(allDf)[2: 10]:
 allDf = allDf[allDf['B17'] <= 100]
 
 # 数据预处理2：婚姻关系修正
-allDf = allDf[(allDf['B6'] != 1) | (allDf['B5'] == 1)] # 剔除未婚单独居住但是家庭成员超过1
-allDf = allDf[(allDf['B6'] != 2) | (allDf['B5'] <= 3)]  # 剔除与父母同居但是家庭成员超过3的
-allDf = allDf[(allDf['B6'] != 3) | (allDf['B5'] == 2)]  # 剔除二人世界但是家庭成员不为2（事先已经检查过没有1）
-allDf = allDf[(allDf['B6'] != 3) | (pd.isna(allDf['B7']))]  # 剔除二人世界但是有小孩的
-allDf = allDf[(allDf['B6'] != 4) | (pd.isna(allDf['B7']))]  # 剔除二人世界但是有小孩的
-allDf = allDf[(allDf['B6'] != 5) | (pd.notna(allDf['B7']))] # 剔除已婚有小孩但是B7没数据的
-allDf = allDf[(allDf['B6'] != 5) | (allDf['B5'] - allDf['B7'] <= 2)] # 剔除已婚有小孩不与父母同居但是人数不对应的
+allDf = allDf[(allDf['B6'] != 1) | (allDf['B5'] == 1)] # 剔除未婚单独居住但是家庭成员超过1, 3
+allDf = allDf[(allDf['B6'] != 2) | (allDf['B5'] <= 3)]  # 剔除与父母同居但是家庭成员超过3的 1
+allDf = allDf[(allDf['B6'] != 3) | (allDf['B5'] == 2)]  # 剔除二人世界但是家庭成员不为2（事先已经检查过没有1） 0
+allDf = allDf[(allDf['B6'] != 3) | (pd.isna(allDf['B7']))]  # 剔除二人世界但是有小孩的 4
+allDf = allDf[(allDf['B6'] != 4) | (pd.isna(allDf['B7']))]  # 剔除二人世界但是有小孩的 0
+allDf = allDf[(allDf['B6'] != 5) | (pd.notna(allDf['B7']))] # 剔除已婚有小孩但是B7没数据的 0
+allDf = allDf[(allDf['B6'] != 5) | (allDf['B5'] - allDf['B7'] <= 2)] # 剔除已婚有小孩不与父母同居但是人数不对应的 2
 
 # 数据预处理3：收入关系修正
 
@@ -31,18 +31,36 @@ tempDf2 = allDf[pd.notna(allDf['B7'])]
 a = len(tempDf1['B7'])
 tempDf1['B7'] = [0 for i in range(a)]
 allDf = tempDf1.append(tempDf2)
-allDf.to_csv('Data\\process.csv', index = False)
 
 # 数据预处理：拆分三款汽车
 dfType1 = allDf[allDf['品牌类型'] == 1]
 dfType2 = allDf[allDf['品牌类型'] == 2]
 dfType3 = allDf[allDf['品牌类型'] == 3]
 
+# 数据预处理2：剔除[\mu +- 3\sigma]
+def cleanTooSmall(name):
+    mu = [name[i].mean() for i in list(name)[2:10]]
+    sigma = [name[i].std() for i in list(name)[2:10]]
+    print(mu, sigma)
+    tmp = 0
+    for i in list(name)[2: 10]:
+        name = name[(name[i] >= mu[tmp] - 3 * sigma[tmp]) | (name[i] <= mu[tmp] + 3 * sigma[tmp])]
+        tmp += 1
+    return name
+
+dfType1 = cleanTooSmall(dfType1)
+dfType2 = cleanTooSmall(dfType2)
+dfType3 = cleanTooSmall(dfType3)
+
+allDf = dfType1.append(dfType2.append(dfType3))
+
+print(len(allDf[allDf['购买意愿'] == 1]))
+
 dfType1.to_csv('Data\\Type1.csv', index = False)
 dfType2.to_csv('Data\\Type2.csv', index = False)
 dfType3.to_csv('Data\\Type3.csv', index = False)
+allDf.to_csv('Data\\process.csv', index = False)
 
-# 数据预处理2：剔除[\mu +- 3\sigma]
 
 # 数据可视化
 # ax部分绘制直方图
@@ -54,10 +72,13 @@ def carScoreFig(name, ntype):
     for i in list(allDf)[2: 10]:
         distance = 5   # 组距
         group_num = int((max(name[i]) - min(name[i])) / distance)
+        mu = name[i].mean()
+        sigma = name[i].std()
         plt.hist(name[i], bins=group_num)
         plt.xlabel('分数')
         plt.ylabel('人数')
         plt.title(titles[t])
+        plt.text(2, 8, '$\mu=${},$\sigma=${}'.format(round(mu, 3), round(sigma, 3)))
         plt.savefig('Fig\\carScore\\' + str(ntype) + '\\' + i + '.png')
         plt.close()
         t += 1
@@ -87,10 +108,13 @@ def cPie(name, comment, labelName):
     plt.close()
 
 def cHist(name, comment):
-    plt.hist(allDf[i])
+    plt.hist(allDf[name])
     plt.xlabel(comment)
     plt.ylabel('人数')
     plt.title(comment)
+    mu = allDf[name].mean()
+    sigma = allDf[name].std()
+    plt.text(2, 8, '$\mu=${},$\sigma=${}'.format(round(mu, 3), round(sigma, 3)))
     plt.savefig('Fig\\characters\\' + name + '.png')
     plt.close()
 
@@ -114,5 +138,29 @@ cHist('B17', '车贷支出占比（单位：%）')
 
 # ax部分的叠加图
 
-    
+
 # ==========描述统计部分=============
+# 均值与方差
+def outputDiscription(name, fname):
+    mu = [name[i].mean() for i in list(name)[2: 10]]
+    sigma = [name[i].std() for i in list(name)[2: 10]]
+    median = [np.median(name[i]) for i in list(name)[2: 10]]
+    
+    with open('Data\\Discription\\' + fname + '.csv', 'w', encoding='utf-8') as f:
+        f.write(',')
+        f.write(','.join(list(name)[2:10]))
+        f.write('\n')
+        f.write('均值,')
+        f.write(','.join([str(s) for s in mu]))
+        f.write('\n')
+        f.write('标准差,')
+        f.write(','.join([str(s) for s in sigma]))
+        f.write('\n')
+        f.write('中位数,')
+        f.write(','.join([str(s) for s in median]))
+    return mu, sigma, median
+
+type1Dis = outputDiscription(dfType1, 'type1')
+type2Dis = outputDiscription(dfType2, 'type2')
+type3Dis = outputDiscription(dfType3, 'type3')
+

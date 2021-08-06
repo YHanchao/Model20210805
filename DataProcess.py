@@ -25,6 +25,7 @@ def boxPlot(name, fname):
 # boxPlot(allDf, 'mainOri')
 
 # 数据预处理2：婚姻关系修正
+'''
 allDf = allDf[(allDf['B6'] != 1) | (allDf['B5'] == 1)] # 剔除未婚单独居住但是家庭成员超过1, 3
 allDf = allDf[(allDf['B6'] != 2) | (allDf['B5'] <= 3)]  # 剔除与父母同居但是家庭成员超过3的 1
 allDf = allDf[(allDf['B6'] != 3) | (allDf['B5'] == 2)]  # 剔除二人世界但是家庭成员不为2（事先已经检查过没有1） 0
@@ -32,7 +33,7 @@ allDf = allDf[(allDf['B6'] != 3) | (pd.isna(allDf['B7']))]  # 剔除二人世界
 allDf = allDf[(allDf['B6'] != 4) | (pd.isna(allDf['B7']))]  # 剔除二人世界但是有小孩的 0
 allDf = allDf[(allDf['B6'] != 5) | (pd.notna(allDf['B7']))] # 剔除已婚有小孩但是B7没数据的 0
 allDf = allDf[(allDf['B6'] != 5) | (allDf['B5'] - allDf['B7'] <= 2)] # 剔除已婚有小孩不与父母同居但是人数不对应的 2
-
+'''
 # 数据预处理3：收入关系修正
 
 tempDf1 = allDf[pd.isna(allDf['B7'])]

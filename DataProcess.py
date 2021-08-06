@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,6 +13,16 @@ allDf = allDf[pd.notna(allDf['品牌类型'])]  # 把原数据中1969行之后�
 for i in list(allDf)[2: 10]:
     allDf = allDf[allDf[i] <= 100]
 allDf = allDf[allDf['B17'] <= 100]
+
+# 绘制箱线图
+def boxPlot(name, fname):
+    # plt.boxplot(column=name[2: 10], showmeans=True, labels=list(name)[2:10],showcaps=True, showbox=True)
+    name.boxplot(column=list(name)[2: 10], showmeans=True)
+    plt.title('各项满意度得分')
+    # plt.show()
+    plt.savefig('Fig\\boxPlot\\' + fname + '.png')
+    plt.close()
+# boxPlot(allDf, 'mainOri')
 
 # 数据预处理2：婚姻关系修正
 allDf = allDf[(allDf['B6'] != 1) | (allDf['B5'] == 1)] # 剔除未婚单独居住但是家庭成员超过1, 3
@@ -54,7 +63,11 @@ dfType3 = cleanTooSmall(dfType3)
 
 allDf = dfType1.append(dfType2.append(dfType3))
 
-print(len(allDf[allDf['购买意愿'] == 1]))
+
+boxPlot(allDf, 'main')
+boxPlot(dfType1, 'type1')
+boxPlot(dfType2, 'type2')
+boxPlot(dfType3, 'type3')
 
 dfType1.to_csv('Data\\Type1.csv', index = False)
 dfType2.to_csv('Data\\Type2.csv', index = False)
@@ -64,6 +77,7 @@ allDf.to_csv('Data\\process.csv', index = False)
 
 # 数据可视化
 # ax部分绘制直方图
+'''
 def carScoreFig(name, ntype):
     titles = ['电池技术性能满意度得分', '舒适性整体表现满意度得分', '经济性整体满意度得分',
         '安全性表现整体满意度得分', '动力性表现整体满意度得分', '驾驶操控性表现整体满意度得分',
@@ -78,7 +92,7 @@ def carScoreFig(name, ntype):
         plt.xlabel('分数')
         plt.ylabel('人数')
         plt.title(titles[t])
-        plt.text(2, 8, '$\mu=${},$\sigma=${}'.format(round(mu, 3), round(sigma, 3)))
+        # plt.text(2, 8, '$\mu=${},$\sigma=${}'.format(round(mu, 3), round(sigma, 3)))
         plt.savefig('Fig\\carScore\\' + str(ntype) + '\\' + i + '.png')
         plt.close()
         t += 1
@@ -86,6 +100,22 @@ def carScoreFig(name, ntype):
 carScoreFig(dfType1, 1)
 carScoreFig(dfType2, 2)
 carScoreFig(dfType3, 3)
+'''
+
+for i in list(allDf)[2: 10]:
+    t = 0
+    titles = ['电池技术性能满意度得分', '舒适性整体表现满意度得分', '经济性整体满意度得分',
+        '安全性表现整体满意度得分', '动力性表现整体满意度得分', '驾驶操控性表现整体满意度得分',
+        '外观内饰整体表现满意度得分', '配置与质量品质整体满意度得分']
+    distance = 5   # 组距
+    group_num = 20
+    plt.hist(dfType1[i], bins=group_num, alpha = 0.5, density=True)
+    plt.hist(dfType2[i], bins=group_num, alpha = 0.5, density=True)
+    plt.hist(dfType3[i], bins=group_num, alpha = 0.5, density=True)
+    plt.title(titles[t])
+    plt.savefig('Fig\\carScore\\4'+ '\\' + i + '.png')
+    plt.close()
+
 
 # bx部分
 def cBar(name, comment, *labelName):
@@ -164,3 +194,4 @@ type1Dis = outputDiscription(dfType1, 'type1')
 type2Dis = outputDiscription(dfType2, 'type2')
 type3Dis = outputDiscription(dfType3, 'type3')
 
+# ===========层次分析===============

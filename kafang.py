@@ -43,13 +43,14 @@ def calCon(df, colName, type=0):
                 f.write('，正例数：{}，总数：{}\n'.format(pL[i], pL[i] + nL[i]))
             f.write('\n=============\n')
 
-    return con
+    return colName, con
 
-allDf = pd.read_csv('Data\\process2.csv')
+allDf = pd.read_csv('Data\\process.csv')
 testL = ['B1', 'B3', 'B5', 'B6', 'B7', 'B9', 'B11', 'B12']
-
+allList = []
 for i in testL:
-    calCon(allDf, i, type=0)
+    c = calCon(allDf, i, type=0)
+    allList.append((c[0], c[1][0], c[1][1], int(i[1: ])))
 
 def cutDf(df, colName, *cut):
     cutL = cut[0]
@@ -70,13 +71,13 @@ def cutDf(df, colName, *cut):
     print(newDf)
     return calCon(newDf, colName, type=1)
 
-B2 = cutDf(allDf, 'B2', tuple(6 * i for i in range(1, 10)))
-B4 = cutDf(allDf, 'B4', tuple(3 * i for i in range(1, 10)))
+B2 = cutDf(allDf, 'B2', tuple(6 * i for i in range(1, 8)))
+B4 = cutDf(allDf, 'B4', tuple(3 * i for i in range(1, 7)))
 # B5 = cutDf(allDf, 'B5', tuple(6 * i for i in range(1, 9)))
-B8 = cutDf(allDf, 'B8', tuple(5 * i for i in range(5, 12)))
-B10 = cutDf(allDf, 'B10', tuple(5 * i for i in range(1, 8)))
-B13 = cutDf(allDf, 'B13', tuple(10 * i for i in range(1, 10)))
-B14 = cutDf(allDf, 'B14', (10,20,30,40,50,60,70,90))
-B15 = cutDf(allDf, 'B15', tuple(10 * i for i in range(1, 8)))
+B8 = cutDf(allDf, 'B8', tuple(5 * i for i in range(5, 10)))
+B10 = cutDf(allDf, 'B10', tuple(5 * i for i in range(1, 6)))
+B13 = cutDf(allDf, 'B13', tuple(10 * i for i in range(1, 7)))
+B14 = cutDf(allDf, 'B14', (10,20,30,40,50))
+B15 = cutDf(allDf, 'B15', tuple(10 * i for i in range(1, 6)))
 B16 = cutDf(allDf, 'B16', tuple(10 * i for i in range(1, 6)))
 B17 = cutDf(allDf, 'B17', tuple(10 * i for i in range(1, 6)))

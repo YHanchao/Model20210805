@@ -226,8 +226,8 @@ class ADASYN(object):
 
 
 # =============================
-df = pd.read_csv('Data\\process2.csv')
-X = df[['a{}'.format(i) for i in range(1, 9)] + ['B{}'.format(i) for i in range(1, 18)]]
+df = pd.read_csv('Data\\process.csv')
+X = df[['品牌类型']+['a{}'.format(i) for i in range(1, 9)] + ['B{}'.format(i) for i in range(1, 18)]]
 X = X.values
 y = df['购买意愿']
 y= y.values
@@ -236,4 +236,12 @@ new_X, new_y = adsn.fit_transform(X, y)
 
 print(len(new_X))
 print(sum(new_y))
+new_data=pd.DataFrame(new_X)
+new_data = pd.concat([new_data, pd.Series(new_y)], axis=1)
+new_data.columns = list(['品牌类型']+['a{}'.format(i) for i in range(1, 9)] + ['B{}'.format(i) for i in range(1, 18)] + ['购买意愿'])
+for i in list(['品牌类型']+['B{}'.format(i) for i in range(1, 18)] + ['购买意愿']):
+    new_data[i] = list(round(j) for j in new_data[i])
+
+new_data.to_csv('Data\\BigData_0.csv', index=False)
+
 np.savez('Data.npz', new_X, new_y)

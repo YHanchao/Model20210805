@@ -1,6 +1,13 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns 
+
+# 支持中文
+plt.rcParams['font.sans-serif'] = ['SimSun']  # 用来正常显示中文标签
+plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
+sns.set_palette("husl")
+plt.style.use('ggplot')
 
 allDf = pd.read_csv('Data\\process2.csv')
 colName = ['a{}'.format(i) for i in range(1, 9)]
@@ -23,12 +30,7 @@ for name in colName:
 
     ax1 = proData1.plot(kind='box', color=dict(boxes='r', whiskers='r', medians='r', caps='r'), sharey=True)
     ax2 = proData0.plot(kind='box', color=dict(boxes='g', whiskers='g', medians='g', caps='g'), sharey=True)
-    # plt.grid(True)
-
     
-    # print(proData0)
-    # quit()
-
     plt.title(name)
     plt.savefig('Fig\\compBoxPlot\\' + name +'.png')
     plt.close()

@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-allDf = pd.read_csv('Data\\BigData.csv')
+allDf = pd.read_csv('Data\\BigData_0.csv')
 
 plt.rcParams['font.sans-serif'] = ['SimSun']  # 用来正常显示中文标签
 plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号

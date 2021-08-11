@@ -1,3 +1,5 @@
+# 原始数据处理：预处理、作图
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -38,10 +40,13 @@ allDf = allDf[(allDf['B6'] != 5) | (pd.notna(allDf['B7']))] # 剔除已婚有小
 allDf = allDf[(allDf['B6'] != 5) | (allDf['B5'] - allDf['B7'] <= 2)] # 剔除已婚有小孩不与父母同居但是人数不对应的 2
 
 # 数据预处理3：收入关系修正
-
+print(len(allDf['a1']))
 allDf = allDf[allDf['B13'] >= allDf['B14']]
+print(len(allDf['a1']))
 allDf = allDf[allDf['B13'] >= allDf['B15']]
+print(len(allDf['a1']))
 allDf = allDf[allDf['B16'] + allDf['B17'] < 100]
+print(len(allDf['a1']))
 
 tempDf1 = allDf[pd.isna(allDf['B7'])]
 tempDf2 = allDf[pd.notna(allDf['B7'])]

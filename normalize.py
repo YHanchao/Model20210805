@@ -10,12 +10,19 @@ plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
 sns.set_palette("husl")
 plt.style.use('ggplot')
 
-df = pd.read_csv('Data\\BigData_0.csv')
+'''
+lambdas = [2.9103821121174294, 3.0452263316847623, 3.1183143357228027, 2.786424689029303,
+    3.1109527292945613, 2.676590710731726, 2.770667715270457, 2.643509845039533]
+
+mus = [126165.49265161884, 217434.12014166993, 279513.1684456264, 77521.41613801624,
+    277605.35024125373, 47959.73097144138, 70367.86732233535, 41633.47840594503]
+'''
+
+df = pd.read_csv('Data\\testData.csv')
 
 changeList = list(['a{}'.format(i) for i in range(1, 9)])
 for i in changeList:
-    print(df[i])
-    df[i], _ = boxcox(df[i], lmbda=None, alpha=None)
+    df[i], lamb = boxcox(df[i], lmbda=None, alpha=None)
     mu, sigma = df[i].mean(), df[i].std()
 
     df[i] = list([(j-mu)/sigma for j in df[i]]) # z-score
@@ -23,9 +30,10 @@ for i in changeList:
     tmp = df[i].values * np.power(np.absolute(df[i].values), -0.1)
     # print(type(tmp), tmp)
     df[i] = tmp
-# y, lambda0 = boxcox(x, lmbda=None, alpha=None)
 
-df.to_csv('Data\\BigData.csv', index=False)
+df.to_csv('Data\\testDataNorm.csv', index=False)
+
+'''
 for i in list(['a{}'.format(i) for i in range(1, 9)]):
     print(df[i].skew(), df[i].kurt())
 
@@ -46,3 +54,4 @@ def carScoreFig(name, ntype=0):
         t += 1
 
 carScoreFig(df)
+'''

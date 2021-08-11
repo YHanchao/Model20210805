@@ -10,6 +10,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.utils import check_array, check_random_state
 from collections import Counter
 from random import randint
+import math
 
 class ADASYN(object):
     """
@@ -224,7 +225,7 @@ class ADASYN(object):
         self.index_new = [i for i in range(0,self.num_new)]
         return(int_X[1:-1], int_y[1:-1])
 
-
+'''
 # =============================
 df = pd.read_csv('Data\\process.csv')
 X = df[['品牌类型']+['a{}'.format(i) for i in range(1, 9)] + ['B{}'.format(i) for i in range(1, 18)]]
@@ -245,3 +246,51 @@ for i in list(['品牌类型']+['B{}'.format(i) for i in range(1, 18)] + ['购�
 new_data.to_csv('Data\\BigData_0.csv', index=False)
 
 np.savez('Data.npz', new_X, new_y)
+'''
+
+X = np.random.random(3000) * 2
+Y = np.random.random(3000) * 2
+
+# 圆形分布
+a = 2 * np.pi * np.random.random(500)
+
+x_in = 0.5 * np.sqrt(np.random.random(500)) * np.cos(a) + 1
+y_in = 0.5 * np.sqrt(np.random.random(500)) * np.sin(a) + 1
+
+adsn = ADASYN(k=7,imb_threshold=0.6, ratio=0.75)
+
+trainData = np.array([X.tolist()+x_in.tolist(), Y.tolist()+y_in.tolist()])
+trainLabel = np.array([0 for i in range(3000)]+[1 for i in range(500)])
+trainLabel.view(-1,1)
+
+
+new_Data, new_Label = adsn.fit_transform(trainData, trainLabel)
+
+new_x = []
+new_y = []
+
+for i in range(len(new_Data[0])):
+    if new_Label[i] > 0.5:
+        new_x.append(new_Data[0][i])
+        new_y.append(new_Data[1][i])
+
+print(new_x,new_y)
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 支持中文
+plt.rcParams['font.sans-serif'] = ['SimSun']  # 用来正常显示中文标签
+plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
+sns.set_palette("husl")
+plt.style.use('ggplot')
+
+plt.figure(dpi=100, figsize=(4, 2))
+fig,axes=plt.subplots(1,2)
+sns.scatterplot(x = X, y = Y, ax = axes[0])
+sns.scatterplot(x = x_in, y = y_in, ax = axes[0])
+sns.scatterplot(x = X, y = Y, ax = axes[1])
+sns.scatterplot(x = new_x, y = new_y, ax = axes[1])
+plt.savefig('Fig\\ADASYN.png')
+plt.show()
+# print(X)
